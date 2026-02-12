@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AnimeWS | Próximamente</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #f97316; /* Naranja AnimeWS */
+            --bg: #0f111a;
+            --card-bg: #161b22;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+
+        /* Canvas para el efecto binario */
+        #binaryCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        /* Contenedor Principal */
+        .content {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 2s ease-in-out;
+        }
+
+        .show {
+            opacity: 1;
+        }
+
+        /* Estilo del Logo que se forma */
+        .logo-text {
+            font-size: 4rem;
+            font-weight: 900;
+            letter-spacing: 5px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .logo-text span {
+            color: var(--primary);
+        }
+
+        /* Cronómetro */
+        .timer-container {
+            background: rgba(22, 27, 34, 0.8);
+            padding: 2rem;
+            border-radius: 20px;
+            border: 1px solid rgba(249, 115, 22, 0.3);
+            backdrop-blur: 10px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+        }
+
+        .status-badge {
+            display: inline-block;
+            background: rgba(249, 115, 22, 0.2);
+            color: var(--primary);
+            padding: 5px 15px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            border: 1px solid var(--primary);
+            text-transform: uppercase;
+        }
+
+        .countdown {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .time-block {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .time-block span:first-child {
+            font-size: 3rem;
+            font-weight: bold;
+        }
+
+        .time-block span:last-child {
+            font-size: 0.7rem;
+            color: #8b949e;
+            text-transform: uppercase;
+        }
+
+        h2 {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            color: #8b949e;
+        }
+
+        .discord-link {
+            margin-top: 30px;
+            display: inline-block;
+            color: #5865F2;
+            text-decoration: none;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .discord-link:hover {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+
+    <canvas id="binaryCanvas"></canvas>
+
+    <div class="content" id="mainContent">
+        <div class="status-badge">Próximamente</div>
+        <h1 class="logo-text">ANIME<span>WS</span></h1>
+        
+        <div class="timer-container">
+            <div class="countdown" id="timer">
+                <div class="time-block"><span id="days">00</span><span>Días</span></div>
+                <div class="time-block"><span id="hours">00</span><span>Hrs</span></div>
+                <div class="time-block"><span id="minutes">00</span><span>Min</span></div>
+                <div class="time-block"><span id="seconds">00</span><span>Seg</span></div>
+            </div>
+            <h2>Actividad App en Discord</h2>
+            <a href="https://discord.gg/NYbUumPCU" class="discord-link">
+                <i class="fa-brands fa-discord"></i> Únete a la tripulación
+            </a>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('binaryCanvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.height = window.innerHeight;
+        canvas.width = window.innerWidth;
+
+        const binary = "01";
+        const fontSize = 16;
+        const columns = canvas.width / fontSize;
+        const drops = [];
+
+        for (let x = 0; x < columns; x++) {
+            drops[x] = 1;
+        }
+
+        function draw() {
+            ctx.fillStyle = "rgba(15, 17, 26, 0.05)";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = "#f97316"; // Naranja de la marca
+            ctx.font = fontSize + "px monospace";
+
+            for (let i = 0; i < drops.length; i++) {
+                const text = binary.charAt(Math.floor(Math.random() * binary.length));
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+
+        // Iniciar animación binaria
+        let animationInterval = setInterval(draw, 33);
+
+        // Transformación: Después de 3 segundos, mostrar el contenido
+        setTimeout(() => {
+            // Bajamos la intensidad de la lluvia binaria
+            clearInterval(animationInterval);
+            animationInterval = setInterval(draw, 100); 
+            
+            // cronómetro con un fade-in
+            document.getElementById('mainContent').classList.add('show');
+            document.getElementById('binaryCanvas').style.opacity = "0.3"; // Opacidad suave de fondo
+        }, 3000);
+
+        // Lógica del Cronómetro (Cuenta regresiva)
+        const targetDate = new Date().getTime() + (7 * 24 * 60 * 60 * 1000);
+
+        function updateTimer() {
+            const now = new Date().getTime();
+            const diff = targetDate - now;
+
+            const d = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const s = Math.floor((diff % (1000 * 60)) / 1000);
+
+            document.getElementById('days').innerText = d < 10 ? '0'+d : d;
+            document.getElementById('hours').innerText = h < 10 ? '0'+h : h;
+            document.getElementById('minutes').innerText = m < 10 ? '0'+m : m;
+            document.getElementById('seconds').innerText = s < 10 ? '0'+s : s;
+        }
+
+        setInterval(updateTimer, 1000);
+        updateTimer();
+
+        // Ajustar canvas si cambia el tamaño de ventana
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+</html>
